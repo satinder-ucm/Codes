@@ -1,0 +1,35 @@
+ &input_param
+
+   dt = 1.e-12
+   xlen = 1.6e-4
+   npts = 80
+   across = 4.e-12
+   across = 4.e-10
+
+   ntherm = 100000
+   nstep =  500000000
+   nout = 100000
+   nstat = 10
+   iper = 0
+   icor = 19
+   dorand = 1
+
+   seed = 10299
+
+   T0 = 400.
+   rhoamb = 1.78e-3
+   camb = 0.5
+
+    mass1 = 6.63e-23
+    mass0 = 6.63e-23
+    mass0 = 19.89e-23
+    d0=3.66e-8
+    d1=3.66e-8
+
+   Tleft =  280.8
+   Tright = 508.5
+   Tleft =  400.
+   Tright = 400.
+/
+
+

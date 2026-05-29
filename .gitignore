@@ -1,14 +1,12 @@
-# Keep the heavyweight repos out of the top-level Codes repo.
-Amrvis/
-FHDeX/
-amrex/
-amrex-tutorials/
-volpack/
-
-# Keep the backup copies out of Git.
-Codes_git_backups/
-
 # Common build and editor junk.
+build/
+install/
+tmp_build_dir/
+tmp_install_dir/
+**/build/
+**/install/
+**/tmp_build_dir/
+**/tmp_install_dir/
 *.o
 *.a
 *.so
@@ -22,3 +20,6 @@ __pycache__/
 .ipynb_checkpoints/
 .vscode/
 .idea/
+**/data.strips
+amrex-tutorials/ExampleCodes/ML/PYTORCH/libtorch-cxx11-abi-shared-with-deps-2.0.1+cpu.zip
+amrex-tutorials/ExampleCodes/ML/PYTORCH/libtorch_cpu/

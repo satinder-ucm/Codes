@@ -1,0 +1,33 @@
+Host Name: moguera
+=== If no file names and line numbers are shown below, one can run
+            addr2line -Cpfie my_exefile my_line_address
+    to convert `my_line_address` (e.g., 0x4a6b) into file name and line number.
+    Or one can use amrex/Tools/Backtrace/parse_bt.py.
+
+=== Please note that the line number reported by addr2line may not be accurate.
+    One can use
+            readelf -wl my_exefile | grep my_line_address'
+    to find out the offset for that line.
+
+ 0: amrvis2d.gnu.ex(+0x23f4a6) [0x5f25341b54a6]
+
+ 1: amrvis2d.gnu.ex(+0x244254) [0x5f25341ba254]
+
+ 2: /lib/x86_64-linux-gnu/libc.so.6(+0x45330) [0x7c3177e45330]
+
+ 3: /lib/x86_64-linux-gnu/libc.so.6(poll+0x14) [0x7c3177f1b4c4]
+
+ 4: /lib/x86_64-linux-gnu/libXt.so.6(_XtWaitForSomething+0x4f9) [0x7c31789e0339]
+
+ 5: /lib/x86_64-linux-gnu/libXt.so.6(XtAppProcessEvent+0x1b3) [0x7c31789e1f43]
+
+ 6: /lib/x86_64-linux-gnu/libXt.so.6(XtAppMainLoop+0x4b) [0x7c31789d69bb]
+
+ 7: amrvis2d.gnu.ex(+0x291c3) [0x5f2533f9f1c3]
+
+ 8: /lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7c3177e2a1ca]
+
+ 9: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7c3177e2a28b]
+
+10: amrvis2d.gnu.ex(+0x2ab35) [0x5f2533fa0b35]
+

@@ -1,0 +1,12 @@
+config.log
+Makefile
+config.cache
+config.status
+config.h
+vp_opts.c
+vp_compA????.c
+vp_warpA????.c
+makeopts
+ti_files
+Debug Release *__Win32_Debug *__Win32_Release
+volpack.ncb volpack.opt *.plg

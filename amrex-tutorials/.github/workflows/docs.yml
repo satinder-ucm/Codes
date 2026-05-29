@@ -1,0 +1,88 @@
+name: Build and Deploy
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+  pull_request:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.head_ref }}-docs
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          fetch-depth: ${{ github.event_name != 'push' && 1 || 0 }}
+
+      - name: Dependencies
+        run: |
+          .github/workflows/dependencies/documentation.sh
+          echo "Installing python packages for docs..."
+          python3 -m pip install --upgrade pip
+          python3 -m pip install sphinx sphinx_rtd_theme breathe sphinxcontrib.bibtex docutils sphinx-copybutton sphinx-design
+
+      - name: Install and Build
+        run: |
+          cd Docs
+          echo "Build the Sphinx documentation for amrex-tutorials."
+          make latexpdf
+          mv build/latex/amrex.pdf source/
+          make html
+
+      - name: Prepare deployment
+        if: github.event_name == 'push'
+        run: |
+          LAST_DEPLOYED=$(curl -sSf "https://raw.githubusercontent.com/AMReX-Codes/AMReX-Codes.github.io/main/amrex/tutorials_html/.deploy-sha" 2>/dev/null || echo "")
+          if [ -n "$LAST_DEPLOYED" ] && git cat-file -e "${LAST_DEPLOYED}^{commit}" 2>/dev/null; then
+            if ! git diff --name-only ${LAST_DEPLOYED}..HEAD \
+                   | grep -q "^Docs/source/"; then
+              echo "No sphinx doc changes since ${LAST_DEPLOYED} — removing PDF to keep published version"
+              rm -f Docs/build/html/_downloads/*/amrex.pdf
+            fi
+          else
+            echo "No previous deploy SHA reachable — keeping PDF"
+          fi
+
+      - name: Deploy
+        if: github.event_name == 'push' && github.repository == 'AMReX-Codes/amrex-tutorials' && github.ref == 'refs/heads/main'
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          # https://blog.benoitblanchon.fr/github-action-run-ssh-commands/
+          echo "Configure SSH"
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          cat >>~/.ssh/config <<END
+          Host *
+            IdentityFile ~/.ssh/deploy_key
+            StrictHostKeyChecking no
+          END
+
+          echo "Configure git"
+          git config --global user.name "$(git log -1 --pretty=format:'%an')"
+          git config --global user.email $(git log -1 --pretty=format:'%ae')
+          git config --global core.ignorecase false
+
+          DEPLOY_SOURCE=${PWD}/Docs/build/html
+          DEPLOY_SOURCE_HEAD=$(git rev-parse --short HEAD)
+          cd ..
+          echo "git clone AMReX-Codes.github.io"
+          git clone --quiet --depth=1 -b main git@github.com:AMReX-Codes/AMReX-Codes.github.io
+          cd AMReX-Codes.github.io/amrex/tutorials_html/
+          rsync -q -av --checksum --progress ${DEPLOY_SOURCE}/. .
+          echo "${DEPLOY_SOURCE_HEAD}" > .deploy-sha
+          git add --all .
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Deploying from amrex-tutorials ${DEPLOY_SOURCE_HEAD}" --no-verify
+            echo "git push to AMReX-Codes.github.io"
+            git push
+            echo "Successfully completed deployment"
+          else
+            echo "No changes to deploy"
+          fi
