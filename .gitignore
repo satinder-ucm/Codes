@@ -1,0 +1,24 @@
+# Keep the heavyweight repos out of the top-level Codes repo.
+Amrvis/
+FHDeX/
+amrex/
+amrex-tutorials/
+volpack/
+
+# Keep the backup copies out of Git.
+Codes_git_backups/
+
+# Common build and editor junk.
+*.o
+*.a
+*.so
+*.exe
+*.dll
+*.dylib
+*.zip
+*.dSYM
+*.pyc
+__pycache__/
+.ipynb_checkpoints/
+.vscode/
+.idea/
